@@ -17,9 +17,20 @@ int main() {
     char* get_message();
     Message* parse_message(char*);
     void free_message(Message*);
+    char* get_resp(int, int);
+    int create_server_socket();
+    int accept_message(int);
+    int send_message(int, const char*);
+    int close_connection(int, int);
+
+
 
     //get message from TCP socket
-    char* message = get_message();
+    // char* message = get_message();
+    int server_fd = create_server_socket();
+    int client_fd = accept_message(server_fd);
+    char* message = get_resp(server_fd, client_fd);
+
     if (message == NULL) {
         fprintf(stderr, "Failed to get message\n");
         return 1;
@@ -43,8 +54,11 @@ int main() {
     }
     printf("\n");
 
-    free_message(parsed_message);
+    send_message(client_fd, "200 OK");
+    close_connection(server_fd, client_fd);
 
+
+    free_message(parsed_message);
 
     return 0;
 }
