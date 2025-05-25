@@ -8,5 +8,7 @@ typedef struct Message {
 } Message;
 
 Message parse_message(char*);
+void trim_newline(char *str);
+void free_message(Message*)
 
 #endif
