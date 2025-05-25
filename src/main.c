@@ -25,5 +25,8 @@ int main() {
     printf("Message: %s\n", message);
     
     parse_message(message);
+    free(message);
+
+    
     return 0;
 }

@@ -54,13 +54,14 @@ char* get_message() {
 
     close(client_fd);
     close(server_fd);
+    
     char* resp = malloc(strlen(buffer) + 1);
     if (resp == NULL) {
         perror("Memory allocation failed");
         return NULL;
     }
 
-    resp = strncpy(resp, buffer, BUFFER_SIZE);
+    resp = strcpy(resp, buffer);
     if (resp == NULL) {
         perror("String copy failed");
         return NULL;
