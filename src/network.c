@@ -9,6 +9,20 @@
 #define PORT 8000
 // #define BUFFER_SIZE 1024
 
+
+typedef struct Buffer {
+    char* data;
+    size_t capacity;
+    size_t buf_len;
+} Buffer;
+
+
+typedef struct Slice {
+    char* data;
+    char* offset;
+    size_t len;
+} Slice;
+
 //create and bind the socket
 int create_server_socket() {
     int server_fd;
@@ -61,19 +75,17 @@ int accept_message(int server_fd) {
 }
 
 //get response from the client and return it
-char* get_resp(char* buffer, int server_fd, int client_fd) {
-    int BUFFER_SIZE = strlen(buffer);
+void get_resp(Buffer* buffer, int server_fd, int client_fd) {
 
     //Recieve the message and load into buffer
-    int n = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
-    if (n > 0) {
-        buffer[n] = '\0';
+    buffer->buf_len = recv(client_fd, buffer->data, buffer->capacity - 1, 0);
+    if (buffer->buf_len > 0) {
+        // buffer.data[n] = '\0';
+
     } else {
         printf("No data received\n");
-        return "400 BAD REQUEST";
+        buffer->data = "400 BAD REQUUEST";
     }
-
-    return buffer;
 
 }
 

@@ -3,7 +3,7 @@
 
 
 char* get_message();
-char* get_resp(char*, int, int);
+char* get_resp(Buffer, int, int);
 int create_server_socket();
 int accept_message(int);
 int send_message(int, const char*);
