@@ -7,7 +7,7 @@
 #include <assert.h>
 
 #define PORT 8000
-#define BUFFER_SIZE 1024
+// #define BUFFER_SIZE 1024
 
 //create and bind the socket
 int create_server_socket() {
@@ -61,8 +61,8 @@ int accept_message(int server_fd) {
 }
 
 //get response from the client and return it
-char* get_resp(int server_fd, int client_fd) {
-    char buffer[BUFFER_SIZE];
+char* get_resp(char* buffer, int server_fd, int client_fd) {
+    int BUFFER_SIZE = strlen(buffer);
 
     //Recieve the message and load into buffer
     int n = recv(client_fd, buffer, BUFFER_SIZE - 1, 0);
@@ -72,20 +72,8 @@ char* get_resp(int server_fd, int client_fd) {
         printf("No data received\n");
         return "400 BAD REQUEST";
     }
-    
-    char* resp = malloc(strlen(buffer) + 1);
-    if (resp == NULL) {
-        perror("Memory allocation failed");
-        return NULL;
-    }
 
-    resp = strcpy(resp, buffer);
-    if (resp == NULL) {
-        perror("String copy failed");
-        return NULL;
-    }
-
-    return resp;
+    return buffer;
 
 }
 
