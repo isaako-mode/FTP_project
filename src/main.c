@@ -9,7 +9,10 @@
 typedef struct Message {
     char* command;
     char* file_name;
+    char* current_directory;
     char** args;
+
+    char* responseType;
 } Message;
 
 int main() {
@@ -31,8 +34,9 @@ int main() {
     int client_fd = accept_message(server_fd);
     char* message = get_resp(server_fd, client_fd);
 
-    if (message == NULL) {
+    if (message == NULL || strcmp(message, "400 BAD REQUEST") == 0) {
         fprintf(stderr, "Failed to get message\n");
+        send_message(client_fd, "400 BAD REQUEST");
         return 1;
     }
 
@@ -48,6 +52,8 @@ int main() {
 
     printf("Command: %s\n", parsed_message->command);
     printf("File: %s\n", parsed_message->file_name);
+    printf("current_dir: %s\n", parsed_message->current_directory);
+
     printf("Arguments: ");
     for (int i = 0; parsed_message->args[i] != NULL; i++) {
         printf("%s ", parsed_message->args[i]);

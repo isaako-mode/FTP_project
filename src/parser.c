@@ -3,7 +3,10 @@
 #include <string.h>
 #include <unistd.h>
 #include "parser.h"
-#define MAX_CMDS 5
+#define MAX_CMDS 6
+
+#define BAD_REQUEST "400 BAD REQUEST"
+#define SUCESS "200 OK"
 /*
 Gameplan:
 
@@ -17,7 +20,10 @@ structure: COMMAND,ARGS,FILE_NAME,FILE
 typedef struct {
     char* command;
     char* file_name;
+    char* current_directory;
     char** args;
+
+    char* responseType;
 
 } Message;
 
@@ -32,6 +38,7 @@ void free_message(Message* message) {
     if (message != NULL) {
         free(message->command);
         free(message->file_name);
+        free(message->current_directory);
         for (int i = 0; message->args[i] != NULL; i++) {
             free(message->args[i]);
         }
@@ -89,7 +96,15 @@ Message* parse_message(char* message) {
         }
     }
 
-    processed_message->args = malloc(sizeof(char*) * (num_cmds - 2) + 1);
+    if(str_array[2] != NULL) {
+        processed_message->current_directory = malloc(strlen(str_array[2]) + 1);
+        if (processed_message->current_directory == NULL) {
+            perror("failed to allocate memory");
+            exit(1);
+        }
+    }
+
+    processed_message->args = malloc(sizeof(char*) * (num_cmds - 3) + 1);
             if (processed_message->args == NULL) {
                 perror("failed to allocate memory");
                 exit(1);
@@ -97,20 +112,23 @@ Message* parse_message(char* message) {
 
     for(int i=0; i<num_cmds; i++) {
         //trim_newline(str_array[i]);
-
-        if(i == 0) {
+        if (i == 0) {
             strcpy(processed_message->command, str_array[i]);
         } 
-        else if(i == 1) {
+        else if (i == 1) {
             strcpy(processed_message->file_name, str_array[i]);
         } 
+        else if (i == 2) {
+            strcpy(processed_message->current_directory, str_array[i]);
+        }
+
         else {
-            processed_message->args[i-2] = malloc(strlen(str_array[i]) + 1);
-            if (processed_message->args[i-2] == NULL) {
+            processed_message->args[i-3] = malloc(strlen(str_array[i]) + 1);
+            if (processed_message->args[i-3] == NULL) {
                 perror("failed to allocate memory");
                 exit(1);
             }
-            strcpy(processed_message->args[i-2], str_array[i]);
+            strcpy(processed_message->args[i-3], str_array[i]);
         }
     }
 
