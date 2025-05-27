@@ -5,23 +5,10 @@
 #include <arpa/inet.h>
 #include "network.h"
 #include <assert.h>
+#include "buffer.h"
 
 #define PORT 8000
 // #define BUFFER_SIZE 1024
-
-
-typedef struct Buffer {
-    char* data;
-    size_t capacity;
-    size_t buf_len;
-} Buffer;
-
-
-typedef struct Slice {
-    char* data;
-    char* offset;
-    size_t len;
-} Slice;
 
 //create and bind the socket
 int create_server_socket() {

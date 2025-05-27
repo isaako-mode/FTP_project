@@ -4,7 +4,10 @@
 #include <unistd.h>
 #include "parser.h"
 #include <assert.h>
-#define MAX_CMDS 6
+#include "slice.h"
+#include "buffer.h"
+#define MAX_CMDS 4
+#define MAX_CMD_LEN 5
 
 #define BAD_REQUEST 400
 #define SUCESS 200
@@ -17,31 +20,6 @@ if firstArg not in valid_commands -> return "400 BAD REQUEST"
 
 structure: COMMAND,ARGS,FILE_NAME,FILE
 */
-
-typedef struct Buffer {
-    char* data;
-    size_t capacity;
-    size_t buf_len;
-} Buffer;
-
-
-typedef struct Slice {
-    char* data;
-    char* offset;
-    size_t len;
-} Slice;
-
-typedef struct {
-    Slice command;
-    Slice file_name;
-    Slice current_directory;
-    Slice arg1;
-    Slice arg2;
-
-    int response_code;
-
-} Message;
-
 
 void trim_newline(char *str) {
     int index = strlen(str) - 1;
@@ -81,7 +59,7 @@ Message* parse_message(Buffer* buffer) {
     for (size_t i=0; i<buffer->buf_len; i++) {
         
         // make sure we don't process more than max commands
-        if (cmd_pos > 4) {
+        if (cmd_pos > MAX_CMDS) {
             break;
         }
 
@@ -97,7 +75,7 @@ Message* parse_message(Buffer* buffer) {
             slice_map[cmd_pos]->data = slice_map[cmd_pos]->offset - slice_map[cmd_pos]->len;
             len_counter = 0;
 
-            if (cmd_pos >= 4) {
+            if (cmd_pos >= MAX_CMDS) {
                 break;
             }
             // Increment to next command and set its offset
@@ -115,6 +93,13 @@ Message* parse_message(Buffer* buffer) {
 
     }
 
+    if (processed_message->command.len > MAX_CMD_LEN) {
+        processed_message->response_code = 400;
+    }
+
+    else {
+        processed_message->response_code = 200;
+    }
 
     return processed_message;
 }

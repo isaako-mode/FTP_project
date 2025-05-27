@@ -1,5 +1,7 @@
-#ifdef PARSER_H
+#ifndef PARSER_H
 #define PARSER_H
+#include "slice.h"
+#include "buffer.h"
 
 typedef struct {
     Slice command;
@@ -12,8 +14,8 @@ typedef struct {
 
 } Message;
 
-Message parse_message(char*);
+Message* parse_message(Buffer* buffer);
 void trim_newline(char *str);
-void free_message(Message*)
+// void free_message(Message*)
 
 #endif

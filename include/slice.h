@@ -1,4 +1,4 @@
-#ifdef SLICE_H
+#ifndef SLICE_H
 #define SLICE_H
 
 #include <stddef.h>
