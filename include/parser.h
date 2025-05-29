@@ -5,10 +5,12 @@
 
 typedef struct {
     Slice command;
-    Slice file_name;
     Slice current_directory;
+    Slice file_name;
+    Slice user_data;
     Slice arg1;
     Slice arg2;
+    Slice file_data;
 
     int response_code;
 

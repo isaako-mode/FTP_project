@@ -3,8 +3,8 @@
 #include "parser.h"
 #include "slice.h"
 
-char* exec_command(Message* message);
-char* list(Slice current_dir);
+char* exec_command(Message* message, Buffer* message_buffer);
+void list(Message* message);
 int eval_cmd(Slice cmd);
 
 #endif

@@ -6,7 +6,7 @@
 #include <assert.h>
 #include "slice.h"
 #include "buffer.h"
-#define MAX_CMDS 4
+#define MAX_CMDS 6
 #define MAX_CMD_LEN 5
 
 #define BAD_REQUEST 400
@@ -45,7 +45,15 @@ Message* parse_message(Buffer* buffer) {
     }
     
     // used to easily access the slices by index when partitioning the buffer
-    Slice* slice_map[] = {&processed_message->command, &processed_message->file_name, &processed_message->current_directory, &processed_message->arg1, &processed_message->arg2};
+    Slice* slice_map[] = {
+        &processed_message->command, 
+        &processed_message->current_directory, 
+        &processed_message->file_name, 
+        &processed_message->user_data, 
+        &processed_message->arg1, 
+        &processed_message->arg2,
+        &processed_message->file_data
+    };
     
     //setup vars: 
         //cmd_pos to track current command being parsed
