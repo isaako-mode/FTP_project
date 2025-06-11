@@ -15,25 +15,27 @@
 #define MAX_USER_OUTPUT_LEN 50
 #define MAX_FILE_NAME_LEN 20
 
-// int slc_str_cmp(Slice slc, const char* str);
+int check_root_dir(Slice* current_dir) {
 
+    // char* root_path = "user_sys/";
+    // int root_path_len = strlen(root_path);
 
-/* 
-typedef struct output {
-    Slice cmd
-    Slice 
+    // if (memcmp(root_path, current_dir->data, root_path_len) != 0) {
+    //     printf("incorrect root directory");
+    //     return 1;
+    // }
+    
+    if(chdir("SCRUBBED") != 0) {
+        perror("cd failed");
+        return 1;
+    }
+    else {
+        printf("Changed directory");  
+    }
+
+    return 0;
+
 }
-
-while(de->d_name !- NULL)
-    assert(file_name < MAX_FILE_NAME)
-    buffer_ptr = output_buffer
-
-    size_t len = strlen(de->d_name)
-    memcpy(buffer_pointer, de->d_name, len)
-
-    buffer_ptr += len
-
-*/
 
 // Evaluate the command to ensure it's in the list of existing ones
 int eval_cmd(Slice cmd) {
@@ -60,18 +62,23 @@ void list(Message* message) {
     //Define directory struct
     struct dirent *de;
     DIR *dr;
-    char* root_path = "./user_sys";
-    int root_path_len = strlen(root_path);
-    
-    // assert(memcmp(message->user_data.data, root_path, root_path_len) == 0);
-    // char* user_root = malloc(sizeof(char) * (root_path, message->current_directory.len));
-    // if (user_root == NULL) {
-    //     perror("malloc failed for user root");
-    //     exit(1);
-    // }
 
-    // memcpy();
-    printf("DIRECTOY: %s\n", message->current_directory.data);
+    if(check_root_dir(&message->current_directory) > 0) {
+        perror("Illegal directory location");
+        return;
+    }
+
+    char path[message->current_directory.len];
+    memcpy(path, message->current_directory.data, message->current_directory.len);
+    if (path == NULL) {
+        perror("MEMCPY FAILED FOR USER PATH");
+        return;
+    }
+
+    path[message->current_directory.len] = '\0';
+
+    printf("\nCURRENT PATH: %s\n", message->current_directory.data);
+
     dr = opendir(message->current_directory.data);
 
     char hidden = '.';
@@ -88,18 +95,25 @@ void list(Message* message) {
             if(strncmp(de->d_name, &hidden, 1) == 0) {
                 continue;
             }
-            printf("%s\n", de->d_name);
+            // printf("%s\n", de->d_name);
 
             // Copy the file name string at the current pointer position
             int len = strlen(de->d_name);
             assert(len < MAX_FILE_NAME_LEN);
-
             // adding 1 for comma separator
             memcpy(next_ptr, de->d_name, len);
 
             // Increment the length and the next pointer position
-            message->user_data.len += len;
+ 
+            // message->user_data.len += len;
             next_ptr += len;
+
+             // Add newline
+            *next_ptr = '\n';
+            next_ptr++;
+
+            // Update length
+            message->user_data.len += len + 1;
         }
         closedir(dr); // Close the directory stream
     } else {
@@ -113,12 +127,26 @@ void list(Message* message) {
 }
 
 char* exec_command(Message* message, Buffer* message_buffer) {
+    
+    // for (size_t i = 0; i < message->current_directory.len; i++) {
+    //     printf("[%02zu] = 0x%02x (%c)\n", i,
+    //         (unsigned char)message->current_directory.data[i],
+    //         message->current_directory.data[i] >= 32 &&
+    //         message->current_directory.data[i] <= 126 ?
+    //         message->current_directory.data[i] : '.');
+    // }
+
     if (eval_cmd(message->command) != 0) {
         return "400 BAD REQUEST";
     }
 
     if (slc_str_cmp(message->command, "LIST") == 0) {
+        printf("\nCOMMAND AT LIST: %s\n", message->command.data);
         list(message);
+    }
+
+    for(size_t i; i<message->user_data.len;i++) {
+        printf("%c", message->user_data.data[i]);
     }
 
     printf("OUTPUT: %s", message->user_data.data);

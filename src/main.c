@@ -51,27 +51,27 @@ int main() {
     }
 
     printf(" COMMAND: ");
-    for (int i = 0; i < parsed_message->command.len;i++) {
+    for (size_t i = 0; i < parsed_message->command.len;i++) {
         printf("%c", parsed_message->command.data[i]);
     }
 
     printf(" DIR NAME: ");
-    for (int i = 0; i < parsed_message->current_directory.len;i++) {
+    for (size_t i = 0; i < parsed_message->current_directory.len;i++) {
         printf("%c", parsed_message->current_directory.data[i]);
     }
 
     printf(" FILENAME: ");
-    for (int i = 0; i < parsed_message->file_name.len;i++) {
+    for (size_t i = 0; i < parsed_message->file_name.len;i++) {
         printf("%c", parsed_message->file_name.data[i]);
     }
 
     printf(" USER_DATA: ");
-    for (int i = 0; i < parsed_message->user_data.len;i++) {
+    for (size_t i = 0; i < parsed_message->user_data.len;i++) {
         printf("%c", parsed_message->user_data.data[i]);
     }
 
     printf(" FILE_DATA: ");
-    for (int i = 0; i < parsed_message->file_data.len;i++) {
+    for (size_t i = 0; i < parsed_message->file_data.len;i++) {
         printf("%c", parsed_message->file_data.data[i]);
     }
 

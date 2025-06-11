@@ -79,8 +79,27 @@ Message* parse_message(Buffer* buffer) {
             assert(i < buffer->buf_len);
             // Configure the slices (length, data, offset)
             buffer->data[i] = '\0';
-            slice_map[cmd_pos]->len = len_counter; 
-            slice_map[cmd_pos]->data = slice_map[cmd_pos]->offset - slice_map[cmd_pos]->len;
+            
+            // check if we have the first command in the message because we 
+            // need to calculate the starting pointer differently
+            if (cmd_pos == 0) {
+                slice_map[cmd_pos]->len = len_counter;
+                slice_map[cmd_pos]->data = slice_map[cmd_pos]->offset - slice_map[cmd_pos]->len;
+            }
+
+            // else if (cmd_pos == MAX_CMDS) {
+            //     slice_map[cmd_pos]->len = len_counter;
+            //     slice_map[cmd_pos]->data = slice_map[cmd_pos]->offset+2 - slice_map[cmd_pos]->len;
+            // }
+            
+            else {
+                // Add two to offset so we don't include the starting newline
+                slice_map[cmd_pos]->len = len_counter;
+                slice_map[cmd_pos]->data = slice_map[cmd_pos]->offset+2 - slice_map[cmd_pos]->len;
+                slice_map[cmd_pos]->len--;
+            }
+
+
             len_counter = 0;
 
             if (cmd_pos >= MAX_CMDS) {
@@ -92,12 +111,14 @@ Message* parse_message(Buffer* buffer) {
 
         }
 
-        //set the boundary values to null
+        // set the boundary values to null
         if (buffer->data[i] == '\n') {
             buffer->data[i] = '\0';
         }
 
         len_counter += 1;
+
+        // assert(slice_map[cmd_pos]->data[slice_map[cmd_pos]->len] == '\0');
 
     }
 
