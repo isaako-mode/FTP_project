@@ -6,6 +6,11 @@
 #define CMD_LEN 4
 
 #define DSPY "DSPY"
-
+#define LIST "LIST"
+#define MOVE "MOVE"
+#define INST "INST"
+#define SORT "SORT"
+#define CHDR "CHDR"
+#define GETF "GETF"
 
 #endif

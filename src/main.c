@@ -9,6 +9,7 @@
 #include "buffer.h"
 #include "slice_lib.h"
 #include "exec_cmd.h"
+#include "user_cmd.h"
 
 #define BUFFER_SIZE 1024
 
@@ -50,35 +51,54 @@ int main() {
         return 0;
     }
 
-    printf(" COMMAND: ");
     for (size_t i = 0; i < parsed_message->command.len;i++) {
         printf("%c", parsed_message->command.data[i]);
     }
 
-    printf(" DIR NAME: ");
+    printf(" dir name: ");
     for (size_t i = 0; i < parsed_message->current_directory.len;i++) {
         printf("%c", parsed_message->current_directory.data[i]);
     }
 
-    printf(" FILENAME: ");
+    printf(" filename: ");
     for (size_t i = 0; i < parsed_message->file_name.len;i++) {
         printf("%c", parsed_message->file_name.data[i]);
     }
 
-    printf(" USER_DATA: ");
+    printf(" user_data: ");
     for (size_t i = 0; i < parsed_message->user_data.len;i++) {
         printf("%c", parsed_message->user_data.data[i]);
     }
+    
+    printf("ARG1");
+    for (size_t i = 0; i < parsed_message->arg1.len;i++) {
+        printf("%c", parsed_message->arg1.data[i]);
+    }
 
-    printf(" FILE_DATA: ");
+
+
+    printf("ARG2: ");
+    for (size_t i = 0; i < parsed_message->arg2.len;i++) {
+        printf("%c", parsed_message->arg2.data[i]);
+    }
+
+
+    printf(" file_data: ");
     for (size_t i = 0; i < parsed_message->file_data.len;i++) {
         printf("%c", parsed_message->file_data.data[i]);
     }
 
-    printf("%s\n", exec_command(parsed_message, message_buffer));
-    
+    // User command enum to track what command the user gave
+    user_cmd input_cmd;
 
-    send_message(client_fd, "200 OK");
+    printf("BUFFER AFTER PARSE: ");
+    for (size_t i = i; i < message_buffer->buf_len; i++) {
+        printf("%c", message_buffer->data[i]);
+    }
+
+    input_cmd = exec_command(parsed_message);
+    
+    send_message(client_fd, parsed_message->user_data.data);
     close_connection(server_fd, client_fd);
 
     // free_message(parsed_message);

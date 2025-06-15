@@ -11,36 +11,15 @@
 #include "slice.h"
 #include "buffer.h"
 #include "command_names.h"
+#include "user_cmd.h"
+#define _XOPEN_SOURCE
 #define MAX_CMD_OUTPUT 50
 #define MAX_USER_OUTPUT_LEN 50
 #define MAX_FILE_NAME_LEN 20
-
-int check_root_dir(Slice* current_dir) {
-
-    // char* root_path = "user_sys/";
-    // int root_path_len = strlen(root_path);
-
-    // if (memcmp(root_path, current_dir->data, root_path_len) != 0) {
-    //     printf("incorrect root directory");
-    //     return 1;
-    // }
-    
-    if(chdir("SCRUBBED") != 0) {
-        perror("cd failed");
-        return 1;
-    }
-    else {
-        printf("Changed directory");  
-    }
-
-    return 0;
-
-}
-
 // Evaluate the command to ensure it's in the list of existing ones
 int eval_cmd(Slice cmd) {
 
-    const char* VALID_CMDS[] = {"LIST", "INST", "FILE", NULL};
+    const char* VALID_CMDS[] = {LIST, INST, NULL};
     int is_valid = 1;
 
 
@@ -56,24 +35,16 @@ int eval_cmd(Slice cmd) {
 }
 
 
-void list(Message* message) {
+int list(Message* message) {
     //change the command to display the directory
     memcpy(message->command.data, DSPY, CMD_LEN);
     //Define directory struct
     struct dirent *de;
     DIR *dr;
 
-    if(check_root_dir(&message->current_directory) > 0) {
-        perror("Illegal directory location");
-        return;
-    }
-
     char path[message->current_directory.len];
     memcpy(path, message->current_directory.data, message->current_directory.len);
-    if (path == NULL) {
-        perror("MEMCPY FAILED FOR USER PATH");
-        return;
-    }
+    
 
     path[message->current_directory.len] = '\0';
 
@@ -117,17 +88,23 @@ void list(Message* message) {
         }
         closedir(dr); // Close the directory stream
     } else {
-        char* error = "Could not open directory";
-        int error_len = strlen(error);
-        perror("Could not open directory");
-        message->user_data.len = error_len;
-        memcpy(message->user_data.data, error, error_len);
+        // char* error = "Could not open directory";
+        // int error_len = strlen(error);
+        // perror("Could not open directory");
+        // message->user_data.len = error_len;
+        // memcpy(message->user_data.data, error, error_len);
+        printf("Could not open directory");
+        return 400;
     }
+
+    return 200;
 
 }
 
-char* exec_command(Message* message, Buffer* message_buffer) {
+user_cmd exec_command(Message* message) {
     
+    user_cmd input_cmd;
+
     // for (size_t i = 0; i < message->current_directory.len; i++) {
     //     printf("[%02zu] = 0x%02x (%c)\n", i,
     //         (unsigned char)message->current_directory.data[i],
@@ -137,12 +114,14 @@ char* exec_command(Message* message, Buffer* message_buffer) {
     // }
 
     if (eval_cmd(message->command) != 0) {
-        return "400 BAD REQUEST";
+        input_cmd = CMD_FAIL;
+        return input_cmd;
     }
 
     if (slc_str_cmp(message->command, "LIST") == 0) {
         printf("\nCOMMAND AT LIST: %s\n", message->command.data);
         list(message);
+        input_cmd = CMD_LIST;
     }
 
     for(size_t i; i<message->user_data.len;i++) {
@@ -152,5 +131,5 @@ char* exec_command(Message* message, Buffer* message_buffer) {
     printf("OUTPUT: %s", message->user_data.data);
 
 
-    return "200 OK";
+    return input_cmd;
 }

@@ -1,0 +1,20 @@
+CC = gcc
+CFLAGS = -Wall -Iinclude -Wextra -pedantic -std=c11 -g 
+TARGET = my_program
+SRCS = src/main.c src/network.c src/parser.c src/exec_cmd.c src/slice_lib.c
+OBJS = $(SRCS:.c=.o)
+
+CHROOT_PATH = /srv/user_sys
+CHROOT_BIN = $(CHROOT_PATH)/bin
+
+all: $(TARGET)
+	sudo install -D $(TARGET) $(CHROOT_BIN)/$(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+clean:
+	rm -f $(TARGET) $(OBJS)
