@@ -10,6 +10,7 @@
 #include "slice_lib.h"
 #include "exec_cmd.h"
 #include "user_cmd.h"
+#include "build_output.h"
 
 #define BUFFER_SIZE 1024
 
@@ -90,19 +91,23 @@ int main() {
 
     // User command enum to track what command the user gave
     user_cmd input_cmd;
-
-    printf("BUFFER AFTER PARSE: ");
-    for (size_t i = i; i < message_buffer->buf_len; i++) {
-        printf("%c", message_buffer->data[i]);
-    }
-
     input_cmd = exec_command(parsed_message);
+
+    for (size_t i = 0; i < message_buffer->buf_len; i++) {
+        printf("[%02zu] = 0x%02x (%c)\n", i,
+        (unsigned char)message_buffer->data[i],
+        message_buffer->data[i] >= 32 &&
+        message_buffer->data[i] <= 126 ?
+        message_buffer->data[i] : '.');
+    }
     
-    send_message(client_fd, parsed_message->user_data.data);
+    configure_output_buff(parsed_message, message_buffer, input_cmd);
+    
+    send_message(client_fd, message_buffer->data);
     close_connection(server_fd, client_fd);
 
     // free_message(parsed_message);
-    free(message_buffer->data);
+    // free(message_buffer->data);
     free(message_buffer);
     free(parsed_message);
 

@@ -37,7 +37,7 @@ int eval_cmd(Slice cmd) {
 
 int list(Message* message) {
     //change the command to display the directory
-    memcpy(message->command.data, DSPY, CMD_LEN);
+    // memcpy(message->command.data, DSPY, CMD_LEN);
     //Define directory struct
     struct dirent *de;
     DIR *dr;
