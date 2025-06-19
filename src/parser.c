@@ -40,6 +40,7 @@ Message* parse_message(Buffer* buffer) {
 
     // Check if the message ends and starts with \n
     if (buffer->data[0] != '\n' || buffer->data[buffer->buf_len - 1] != '\n') {
+        printf("400 BACK REQ DUE TO MESSAGE BOUNDARY FORMAT");
         processed_message->response_code = 400;
         return processed_message;
     }
@@ -123,6 +124,7 @@ Message* parse_message(Buffer* buffer) {
     }
 
     if (processed_message->command.len > MAX_CMD_LEN) {
+        printf("MAX COMMANDS EXCEEDED");
         processed_message->response_code = 400;
     }
 

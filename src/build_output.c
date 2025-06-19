@@ -17,12 +17,28 @@
 #define OK "200"
 #define BAD_REQUEST "400"
 
+// Calculate new length of output buffer
+void set_buf_len(Message* message, Buffer* buffer) {
+	size_t sum;
+	sum = message->command.len + 
+	message->current_directory.len + 
+	message->file_name.len + 
+	message->user_data.len + 
+	message->arg1.len + 
+	message->arg2.len + 
+	message->file_data.len;
+
+	buffer->buf_len = sum;
+
+}
+
 int build_list_rsp(Message* message, Buffer* buffer) {
 	// \n200.\r\n\r\nFILES\r\n
 		for(size_t i=0; i< buffer->buf_len; i++) {
 	// message->file_data.offset
 			printf("%c", buffer->data[i]);
 			if(buffer->data[i] == '\0' && buffer->data[i+1] == '\0') {
+				printf("CONDITION HIT");	
 				buffer->data[i] = '\r';
 				buffer->data[i+1] = '\n';
 		
@@ -34,10 +50,13 @@ int build_list_rsp(Message* message, Buffer* buffer) {
 
 int configure_output_buff(Message* message, Buffer* buffer, user_cmd input_cmd) {
 
+	set_buf_len(message, buffer);
 	printf("%s", message->command.data);
-	
-	memset(message->command.data, '\0', message->command.len);
-	memcpy(message->command.data, OK, strlen(OK));
+	char* output_start;
+	output_start = message->command.data + 1;	
+
+	memset(message->command.data, '\n', message->command.len);
+	memcpy(output_start, OK, strlen(OK));
 	// Setup surrounding newlines for output
 	buffer->data[0] = '\n';
 	buffer->data[buffer->buf_len] = '\n';
