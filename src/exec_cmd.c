@@ -48,7 +48,7 @@ int list(Message* message) {
 
     path[message->current_directory.len] = '\0';
 
-    printf("\nCURRENT PATH: %s\n", message->current_directory.data);
+    // printf("\nCURRENT PATH: %s\n", message->current_directory.data);
 
     dr = opendir(message->current_directory.data);
 
@@ -56,6 +56,7 @@ int list(Message* message) {
 
     // pointer to track the user data memory position as file names are added
     char* next_ptr = message->user_data.data;
+    int counter = 0;
 
     // Reset the user data memory length as we are rewriting it
     message->user_data.len = 0;
@@ -85,7 +86,9 @@ int list(Message* message) {
 
             // Update length
             message->user_data.len += len + 1;
+            counter++;
         }
+
         closedir(dr); // Close the directory stream
     } else {
         // char* error = "Could not open directory";

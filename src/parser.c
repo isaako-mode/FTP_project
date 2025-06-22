@@ -39,11 +39,11 @@ Message* parse_message(Buffer* buffer) {
     }
 
     // Check if the message ends and starts with \n
-    if (buffer->data[0] != '\n' || buffer->data[buffer->buf_len - 1] != '\n') {
-        printf("400 BACK REQ DUE TO MESSAGE BOUNDARY FORMAT");
-        processed_message->response_code = 400;
-        return processed_message;
-    }
+    // if (buffer->data[0] != '\n' || buffer->data[buffer->buf_len - 1] != '\n') {
+    //     printf("400 BACK REQ DUE TO MESSAGE BOUNDARY FORMAT");
+    //     processed_message->response_code = 400;
+    //     return processed_message;
+    // }
     
     // used to easily access the slices by index when partitioning the buffer
     Slice* slice_map[] = {

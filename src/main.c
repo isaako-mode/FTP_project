@@ -38,7 +38,7 @@ int main() {
     int max_messages;
     max_messages = 0;
 
-    while (max_messages < 4) {
+    while (1==1) {
         // get the response and load it into the message buffer
         get_resp(message_buffer, server_fd, client_fd);
 
@@ -54,7 +54,7 @@ int main() {
         {
             send_message(client_fd, "400 BAD REQUEST");
             // close_connection(server_fd, client_fd);
-            return 0;
+            continue;
         }
 
         for (size_t i = 0; i < parsed_message->command.len; i++)
