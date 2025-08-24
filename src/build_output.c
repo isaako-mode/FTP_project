@@ -13,6 +13,7 @@
 #include "command_names.h"
 #include "slice_lib.h"
 #include "user_cmd.h"
+#include "response_message.h"
 
 #define OK "200"
 #define BAD_REQUEST "400"
@@ -47,40 +48,43 @@ int build_list_rsp(Message* message, Buffer* buffer) {
 	return 200;
 }
 
-
-int configure_output_buff(Message* message, Buffer* buffer, user_cmd input_cmd) {
-
-	set_buf_len(message, buffer);
-	printf("%s", message->command.data);
-	char* output_start;
-	output_start = message->command.data + 1;	
-
-	memset(message->command.data, '\n', message->command.len);
-	memcpy(output_start, OK, strlen(OK));
-	// Setup surrounding newlines for output
-	buffer->data[0] = '\n';
-	buffer->data[buffer->buf_len] = '\n';
-
-	// increment to skip over the newline
-	buffer->data += 1;
-
-	// Copy 200 OK response to the cmd position of the buffer
-	// memcpy(buffer->data, OK, strlen(OK));
-
-	buffer->data[strlen(OK) + 1] = '\0';
-
-	switch(input_cmd) {
-	case CMD_LIST:
-		build_list_rsp(message, buffer);
-	}
-
-
-    for (size_t i = 0; i < buffer->buf_len; i++) {
-        printf("IN THE FUNC [%02zu] = 0x%02x (%c)\n", i,
-        (unsigned char)buffer->data[i],
-        buffer->data[i] >= 32 &&
-        buffer->data[i] <= 126 ?
-        buffer->data[i] : '.');
-    }
-	return 200;
+int configure_output_buff(Message* message, ResponseMessage* response_buff) {
+	
 }
+
+// int configure_output_buff(Message* message, Buffer* buffer, user_cmd input_cmd) {
+
+// 	set_buf_len(message, buffer);
+// 	printf("%s", message->command.data);
+// 	char* output_start;
+// 	output_start = message->command.data + 1;	
+
+// 	memset(message->command.data, '\n', message->command.len);
+// 	memcpy(output_start, OK, strlen(OK));
+// 	// Setup surrounding newlines for output
+// 	buffer->data[0] = '\n';
+// 	buffer->data[buffer->buf_len] = '\n';
+
+// 	// increment to skip over the newline
+// 	buffer->data += 1;
+
+// 	// Copy 200 OK response to the cmd position of the buffer
+// 	// memcpy(buffer->data, OK, strlen(OK));
+
+// 	buffer->data[strlen(OK) + 1] = '\0';
+
+// 	switch(input_cmd) {
+// 	case CMD_LIST:
+// 		build_list_rsp(message, buffer);
+// 	}
+
+
+//     for (size_t i = 0; i < buffer->buf_len; i++) {
+//         printf("IN THE FUNC [%02zu] = 0x%02x (%c)\n", i,
+//         (unsigned char)buffer->data[i],
+//         buffer->data[i] >= 32 &&
+//         buffer->data[i] <= 126 ?
+//         buffer->data[i] : '.');
+//     }
+// 	return 200;
+// }

@@ -35,31 +35,31 @@ int eval_cmd(Slice cmd) {
 }
 
 
-int list(Message* message) {
+int list(Slice* output_buff, Slice* current_directory) {
     //change the command to display the directory
     // memcpy(message->command.data, DSPY, CMD_LEN);
     //Define directory struct
     struct dirent *de;
     DIR *dr;
 
-    char path[message->current_directory.len];
-    memcpy(path, message->current_directory.data, message->current_directory.len);
+    char path[current_directory->len];
+    memcpy(path, current_directory->data, current_directory->len);
     
 
-    path[message->current_directory.len] = '\0';
+    path[current_directory->len] = '\0';
 
     // printf("\nCURRENT PATH: %s\n", message->current_directory.data);
 
-    dr = opendir(message->current_directory.data);
+    dr = opendir(current_directory->data);
 
     char hidden = '.';
 
     // pointer to track the user data memory position as file names are added
-    char* next_ptr = message->user_data.data;
+    char* next_ptr = output_buff->data;
     int counter = 0;
 
     // Reset the user data memory length as we are rewriting it
-    message->user_data.len = 0;
+    output_buff->len = 0;
     if (dr != NULL) {
         while ((de = readdir(dr)) != NULL) {
 
@@ -85,7 +85,7 @@ int list(Message* message) {
             next_ptr++;
 
             // Update length
-            message->user_data.len += len + 1;
+            output_buff->len += len + 1;
             counter++;
         }
 
@@ -104,7 +104,7 @@ int list(Message* message) {
 
 }
 
-user_cmd exec_command(Message* message) {
+user_cmd exec_command(Slice* dest, Message* message) {
     
     user_cmd input_cmd;
 
@@ -123,7 +123,7 @@ user_cmd exec_command(Message* message) {
 
     if (slc_str_cmp(message->command, "LIST") == 0) {
         printf("\nCOMMAND AT LIST: %s\n", message->command.data);
-        list(message);
+        list(dest, &message->current_directory);
         input_cmd = CMD_LIST;
     }
 

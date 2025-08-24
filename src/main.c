@@ -11,9 +11,11 @@
 #include "exec_cmd.h"
 #include "user_cmd.h"
 #include "build_output.h"
+#include "response_message.h"
 
 #define BUFFER_SIZE 2048
 #define MAX_MSG 4
+#define OUTPUT_SIZE 2048
 int main() {
 
     // Configure the buffer
@@ -24,6 +26,7 @@ int main() {
         exit(1);
     }
 
+    // Set and allocate pre defined buffer size 
     message_buffer->capacity = BUFFER_SIZE;
     message_buffer->data = malloc(sizeof(char) * BUFFER_SIZE);
     message_buffer->buf_len = 0;
@@ -109,17 +112,23 @@ int main() {
                        : '.');
         }
 
+        ResponseMessage* response_buff;
+        response_buff = malloc(sizeof(response_buff)); 
+        Slice* cmd_output = malloc(sizeof(Slice));
+        cmd_output->data = malloc(sizeof(char*)*OUTPUT_SIZE);
+
         // User command enum to track what command the user gave
         user_cmd input_cmd;
-        input_cmd = exec_command(parsed_message);
+        // execute command in parsed message then store it in cmd_output
+        exec_command(cmd_output, parsed_message);
 
-        for (size_t i = 0; i < message_buffer->buf_len; i++)
+        for (size_t i = 0; i < cmd_output->len; i++)
         {
             printf("[%02zu] = 0x%02x (%c)\n", i,
-                   (unsigned char)message_buffer->data[i],
-                   message_buffer->data[i] >= 32 &&
-                           message_buffer->data[i] <= 126
-                       ? message_buffer->data[i]
+                   (unsigned char)cmd_output->data[i],
+                   cmd_output->data[i] >= 32 &&
+                           cmd_output->data[i] <= 126
+                       ? cmd_output->data[i]
                        : '.');
         }
 
